@@ -34,7 +34,9 @@ def bundle(app, framework):
             subprocess.run(['lipo', str(path), '-thin', 'x86_64', '-output', str(temporary)], check=True)
             temporary.chmod(path.stat().st_mode)
             temporary.replace(path)
-        subprocess.run(['codesign', '--remove-signature', str(path)], check=True)
+        # Keep the existing signature allocation while editing load commands.
+        # Xcode 16 install_name_tool can reject the __LINKEDIT layout left by
+        # codesign --remove-signature. Every edited image is re-signed below.
         loads = compat.run('otool', '-arch', 'x86_64', '-l', str(path))
         own_id = re.search(r'cmd LC_ID_DYLIB\s+cmdsize \d+\s+name (.+?) \(offset \d+\)', loads)
         changes = []
