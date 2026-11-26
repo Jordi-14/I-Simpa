@@ -32,8 +32,10 @@ python3 .github/scripts/check-bundled-python.py /path/isimpa.app
 The five native regressions cover nested `@executable_path`, inherited `@rpath`,
 missing libraries, a runtime dependency with a newer deployment target, and
 external dependencies in a standalone package. The embedded runtime smoke test
-uses `Py_Initialize()` (as I-Simpa does), removes Python/DYLD environment overrides,
+uses the same `PyConfig` initialization as I-Simpa, removes Python/DYLD environment overrides,
 and imports SSL, SQLite, ctypes, Tkinter, and zstd while checking `sys.prefix`.
+macOS initialization disables bytecode writes so imports cannot invalidate the
+signed framework by creating cache files inside it.
 The workflow checks both the build tree and the mounted DMG before upload.
 
 These checks do not replace running I-Simpa and acoustic simulations on a real
